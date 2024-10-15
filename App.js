@@ -43,7 +43,7 @@ function AuthenticatedStack() {
         options={{
           headerRight: ({ tintColor }) => (
             <IconButton
-              icon={exit}
+              icon="exit"
               color={tintColor}
               size={24}
               onPress={authCtx.logout}
