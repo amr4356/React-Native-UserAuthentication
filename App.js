@@ -10,6 +10,7 @@ import AuthContextProvider, { AuthContext } from "./store/auth-context";
 import { useContext, useEffect, useState } from "react";
 import IconButton from "./components/ui/IconButton";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import LoadingOverlay from "./components/ui/LoadingOverlay";
 
 const Stack = createNativeStackNavigator();
 
@@ -29,7 +30,7 @@ function AuthStack() {
 }
 
 function AuthenticatedStack() {
-  const authCtx = useContext(AuthContext);
+  const {logout} = useContext(AuthContext);
   return (
     <Stack.Navigator
       screenOptions={{
@@ -47,7 +48,7 @@ function AuthenticatedStack() {
               icon="exit"
               color={tintColor}
               size={24}
-              onPress={authCtx.logout}
+              onPress={logout}
             />
           ),
         }}
@@ -68,16 +69,24 @@ function Navigation() {
 
 function Root() {
   const authCtx = useContext(AuthContext);
+  const [isTryingLogin,setIsTryingLogin]=useState(true);
   useEffect(() => {
     async function fetchToken() {
       const storedToken = await AsyncStorage.getItem("token");
       if (storedToken) {
         authCtx.authenticate(storedToken);
       }
+
+      setIsTryingLogin(false);
     }
 
     fetchToken();
   }, []);
+
+  if (isTryingLogin) {
+    return <LoadingOverlay message="continuing the session..." />;
+  }
+
 
   return <Navigation />;
 }
